@@ -1,10 +1,13 @@
-const { User } = require("../db");
+const {
+  getEmailController,
+  createUserController,
+} = require("../controllers/loginControllers");
 
 const loginHandler = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).send("Faltan datos");
-    const user = await User.findOne({ where: { email } });
+    const user = await getEmailController(email);
     if (!user) return res.status(404).send("Usuario no encontrado");
     if (user.password != password) {
       return res.status(403).send("Contraseña incorrecta");
@@ -19,7 +22,7 @@ const createUserHandler = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).send("Faltan datos");
-    const user = await User.findOrCreate({ where: { email, password } });
+    const user = await createUserController(email, password);
     return res.status(200).json(user);
   } catch (error) {
     return res.status(500).send(error.message);

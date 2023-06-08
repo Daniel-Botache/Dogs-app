@@ -1,11 +1,11 @@
-const { Temperaments } = require("../db");
-const URL = "https://api.thedogapi.com/v1/breeds/";
-const axios = require("axios");
+const { DogsFromApi } = require("../controllers/dogsControllers");
+const {
+  createTemperamentsDb,
+} = require("../controllers/temperamentsControllers");
 
 const getTemperamentsHandler = async (req, res) => {
   try {
-    const responseApi = await axios.get(`${URL}`);
-    const data = responseApi.data;
+    const data = await DogsFromApi();
     let temperamentsArray = [];
     data.forEach((dog) => {
       if (dog.temperament) {
@@ -17,9 +17,7 @@ const getTemperamentsHandler = async (req, res) => {
         });
       }
     });
-    const temperaments = await Temperaments.bulkCreate(
-      temperamentsArray.map((temperament) => ({ name: temperament }))
-    );
+    const temperaments = createTemperamentsDb(temperamentsArray);
     res.status(200).json(temperamentsArray);
   } catch (error) {
     res.status(500).json(error.message);
