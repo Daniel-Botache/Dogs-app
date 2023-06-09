@@ -43,7 +43,10 @@ const { Dogs, Temperaments, User } = sequelize.models;
 // Product.hasMany(Reviews);
 
 //relation many to many with mid table Dog_Temperaments
-Dogs.belongsToMany(Temperaments, { through: "Dog_Temperaments" });
+Dogs.belongsToMany(Temperaments, {
+  through: "Dog_Temperaments",
+  as: "temperament",
+});
 Temperaments.belongsToMany(Dogs, { through: "Dog_Temperaments" });
 
 //relation one to many

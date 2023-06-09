@@ -19,6 +19,11 @@ module.exports = (sequelize) => {
       height: { type: DataTypes.STRING, allowNull: false },
       lifespan: { type: DataTypes.STRING, allowNull: false },
       image: { type: DataTypes.STRING, allowNull: false },
+      created: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: false,
+      },
     },
     { timestamps: false }
   );

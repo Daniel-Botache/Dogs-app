@@ -1,11 +1,11 @@
-const { DogsFromApi } = require("../controllers/dogsControllers");
+const { dogsFromApi } = require("../controllers/dogsControllers");
 const {
   createTemperamentsDb,
 } = require("../controllers/temperamentsControllers");
 
 const getTemperamentsHandler = async (req, res) => {
   try {
-    const data = await DogsFromApi();
+    const data = await dogsFromApi();
     let temperamentsArray = [];
     data.forEach((dog) => {
       if (dog.temperament) {

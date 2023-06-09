@@ -1,7 +1,6 @@
 const {
-  DogsFromApi,
-  getAllDogs,
-  getDogByIdFromApi,
+  dogsFromApi,
+  dogsFromDb,
   getDogByIdFromDB,
   getDogByNameFromApi,
   getDogByNameFromDb,
@@ -13,8 +12,8 @@ const {
 
 const getDogsHandler = async (req, res) => {
   try {
-    const data = await DogsFromApi();
-    const responseDb = await getAllDogs();
+    const data = await dogsFromApi();
+    const responseDb = await dogsFromDb();
     const dogsArray = [...data, ...responseDb]; //array where the dogs from the API and the DB will be stored
     return res.status(200).json(dogsArray);
   } catch (error) {
@@ -28,12 +27,17 @@ const getDogsByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
     let dog = {};
-    if (id.length < 4) {
-      dog = await getDogByIdFromApi(id);
+    const dogsApi = await DogsFromApi();
+    const idSource = isNaN(id);
+    if (!idSource) {
+      dog = dogsApi.find((element) => {
+        return element.id == id;
+      });
     } else {
-      dog = await getDogByIdFromDB();
+      dog = await getDogByIdFromDB(id);
     }
     if (!dog.name) return res.status(404).send("dog not found");
+    console.log(dog);
     return res.status(200).json(dog);
   } catch (error) {
     return res.status(500).send(error.message);
@@ -72,16 +76,19 @@ const getDogByNameHandler = async (req, res) => {
 
 const createDogHandler = async (req, res) => {
   try {
-    const { name, weight, height, lifespan, image, UserId } = req.body;
-    if (!name || !weight || !height || !lifespan || !image)
+    const { name, weight, height, lifespan, temperaments, image, userId } =
+      req.body;
+    if (!name || !weight || !height || !lifespan || !image || !temperaments)
       return res.status(400).send("Faltan datos");
+    console.log(temperaments);
     const dog = await createDogsController(
       name,
       weight,
       height,
       lifespan,
+      temperaments,
       image,
-      UserId
+      userId
     );
     return res.status(200).json(dog);
   } catch (error) {
@@ -95,7 +102,7 @@ const deleteDoghandler = async (req, res) => {
   try {
     const { id } = req.params;
     await deleteDogsController(id);
-    const dogs = await getAllDogs();
+    const dogs = await dogsFromDb();
     return res.status(200).json(dogs);
   } catch (error) {
     return res.status(500).send(error.message);
